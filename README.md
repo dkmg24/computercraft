@@ -1,2 +1,1 @@
-# computercraft
 computercraft scripts
