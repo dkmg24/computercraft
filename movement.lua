@@ -1,11 +1,11 @@
 -- stateful turtle movement
 
 
-local movement = {}
-
-
 inventory = require "inventory"
 -- os.loadAPI("inventory")
+
+
+movement = {}
 
 
 -- PARAMS / CONSTANTS
@@ -85,14 +85,12 @@ function movement.move(mv, orient, dig)
   if(turtle.getFuelLevel() == 0) then
 
     -- refuel
-    turtle.select(fuelSlot)
-    if turtle.getItemCount() == 0 then
+    if turtle.getItemCount(fuelSlot) == 0 then
       io.write("Move attempted to refuel but I am out of fuel!\n")
       return false
     end
 
     turtle.refuel(1)  -- only take one fuel unit (hollywood HILLLSS)
-    turtle.select(selectedSlot)  -- go back to old slot
   end
 
   -- moves

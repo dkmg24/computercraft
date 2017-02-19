@@ -5,7 +5,7 @@ movement = require "movement"
 -- os.loadAPI("movement")
 
 
-local mining = {}
+mining = {}
 
 
 -- PUBLIC

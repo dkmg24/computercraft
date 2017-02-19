@@ -29,8 +29,7 @@ function inventory.refreshState()
     for i=1,16 do
 
         -- get slot item count
-        turtle.select(i)  -- select without updating state (must fix at the end)
-        numItems = turtle.getItemCount()
+        numItems = turtle.getItemCount(i)
 
         -- update our inventory state
         if(numItems == 0) then
@@ -39,9 +38,6 @@ function inventory.refreshState()
             slotToId[i] = inventory.BID_ANY
         end
     end
-
-    -- need to return to the slot we started at before we did the search
-    turtle.select(selectedSlot)
 end
 
 -- selects the slot while maintaining state
@@ -63,19 +59,15 @@ function inventory.find(blockId)
         if((slotToId[i] == blockId) and (not (i == fuelSlot))) then
             
             -- get the number of items in this slot
-            turtle.select(i)
-            numItems = turtle.getItemCount()
+            numItems = turtle.getItemCount(i)
 
             -- if there's actually an item in here then return
             if numItems > 0 then
-
-                turtle.select(selectedSlot)  -- back to old slot
                 return i
             end
         end
     end
 
-    turtle.select(selectedSlot)
     return -1
 end
 
