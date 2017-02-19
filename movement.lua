@@ -1,6 +1,11 @@
 -- stateful turtle movement
 
-require "math"
+
+local movement = {}
+
+
+inventory = require "inventory"
+-- os.loadAPI("inventory")
 
 
 -- PARAMS / CONSTANTS
@@ -12,19 +17,19 @@ MOVES_COAL = 80
 -- keep track of x, y, z coordinates and orientation
 position = {x=0, y=0, z=0}
 orientation = 0  -- 0:x+, 1:y+, 2:x-, 3:y-
--- keep track of our fuel location
+-- keep track of our fuel/home location
 fuelGetPadding = 0
 fuelPosition = {x=0, y=0, z=0}  -- wherever we started
 
 
--- HELPERS
+-- PRIVATE
 -- manhattan distance from one point to another
-function distance(start, stop)
+local function distance(start, stop)
   return ((stop.x - start.x) + (stop.y - start.y) + (stop.z - start.z))
 end
 
 -- computes the resulting orientation after a turn
-function newOrientation(old, turn)
+local function newOrientation(old, turn)
 
   -- wrap if we're at an edge
   if((old == 0) and (turn == -1)) then
@@ -38,7 +43,7 @@ function newOrientation(old, turn)
 end
 
 -- computes the incremented position after a move
-function newPosition(old, move)
+local function newPosition(old, move)
 
   if(move == 'forward') then
     if(orientation == 0) then
@@ -69,13 +74,25 @@ function newPosition(old, move)
   return old
 end
 
+
+-- PUBLIC
 -- moves and tracks position in space
 -- both should be given in relative coordinates (1 or -1) one at a time
-function move(mv, orient, dig)
+-- will refuel as necessary
+function movement.move(mv, orient, dig)
 
   -- refuel if necessary
-  if(turtle.getFuelLevel() < 1) then
-    turtle.refuel(1)
+  if(turtle.getFuelLevel() == 0) then
+
+    -- refuel
+    turtle.select(fuelSlot)
+    if turtle.getItemCount() == 0 then
+      io.write("Move attempted to refuel but I am out of fuel!\n")
+      return false
+    end
+
+    turtle.refuel(1)  -- only take one fuel unit (hollywood HILLLSS)
+    turtle.select(selectedSlot)  -- go back to old slot
   end
 
   -- moves
@@ -150,71 +167,4 @@ function move(mv, orient, dig)
   end
 end
 
--- mines a 2 high by 1 wide by xstop long tunnel
-function mineTunnel(xstop)
-
-  local x = 0  -- local tracking (not absolute position)
-  while(math.abs(x) < math.abs(xstop)) do
-
-    -- forward
-    move({x=1, y=0, z=0}, 0, true)
-    x = x + 1
-
-    -- up
-    move({x=0, y=0, z=1}, 0, true)
-
-    -- forward
-    move({x=1, y=0, z=0}, 0, true)
-    x = x + 1
-
-    -- down
-    move({x=0, y=0, z=-1}, 0, true)
-  end
-end
-
--- mines a layer by calling mine tunnel
-function mineLayer(xstop, ystop, turn, stride)
-
-  local y = 0
-  while(math.abs(y) < math.abs(ystop)) do
-
-    -- mine to end
-    mineTunnel(xstop)
-
-    -- turn
-    move({x=0, y=0, z=0}, turn, true)
-
-    -- mine the turning area
-    mineTunnel(stride)
-    y = y + stride
-
-    -- turn to face next col
-    move({x=0, y=0, z=0}, turn, true)
-
-    -- @ end of next col will turn opposite direction
-    turn = -turn
-  end
-end
-
--- mines a people-sized mine
-function mine(xstop, ystop, zstop, turn, stride, upDown)
-
-  local z = 0
-  while(math.abs(z) < math.abs(zstop)) do
-
-    -- generate a layer
-    mineLayer(xstop, ystop, turn, stride)
-
-    -- move to the next layer
-    move({x=0, y=0, z=upDown}, 0, true)
-    move({x=0, y=0, z=upDown}, 0, true)
-    move({x=0, y=0, z=upDown}, 0, true)
-    z = z + (upDown * 2)
-
-    turn = -turn
-  end
-end
-
-
-
-
+return movement
