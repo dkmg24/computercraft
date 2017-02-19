@@ -86,11 +86,11 @@ function movement.move(mv, orient, dig)
 
     -- refuel
     if turtle.getItemCount(fuelSlot) == 0 then
-      io.write("Move attempted to refuel but I am out of fuel!\n")
+      io.write("Move attempted to refuel but I am out of fuel (units)!\n")
       return false
     end
 
-    turtle.refuel(1)  -- only take one fuel unit (hollywood HILLLSS)
+    turtle.refuel(1)  -- only take one fuel unit
   end
 
   -- moves

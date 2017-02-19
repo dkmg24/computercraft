@@ -126,9 +126,9 @@ function turtle.select(num)
   turtle.selectedSlot = num
 end
 
-function turtle.getItemCount()
+function turtle.getItemCount(num)
   -- io.write(string.format("Item count of slot %d is %d", turtle.selectedSlot, turtle.inventory[turtle.selectedSlot].qty), "\n")
-  return turtle.inventory[turtle.selectedSlot].qty
+  return turtle.inventory[num].qty
 end
 
 return turtle
